@@ -1,26 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Model } from 'mongoose';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { Order } from './interfaces/order.interface';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class OrdersService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  constructor(
+    @Inject('ORDER_MODEL') private readonly orderModel: Model<Order>,
+  ) {}
+
+
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const createdOrder = new this.orderModel(createOrderDto);
+    return createdOrder.save();
   }
 
-  findAll() {
-    return `This action returns all orders`;
+
+  async findAll(): Promise<Order[]> {
+    return this.orderModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
-  }
+  async findOne(id: string): Promise<Order> {
+    const order = await this.orderModel.findById(id).exec();
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
+     if(!order){
+      throw new RpcException({
+        message: `Order #${id} not found`,
+        status: HttpStatus.NOT_FOUND
+      })}
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+    return order;
   }
 }
