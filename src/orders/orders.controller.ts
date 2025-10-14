@@ -21,4 +21,9 @@ export class OrdersController {
   async findOne(@Payload('id') id: string) {
     return this.ordersService.findOne(id);
   }
+
+  @MessagePattern({ cmd: 'findOneOrderByUser' })
+  async findOneByUser(@Payload('id') userId: number) {
+    return this.ordersService.findOneByUser(userId);
+  }
 }

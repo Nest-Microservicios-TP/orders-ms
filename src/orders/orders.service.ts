@@ -32,4 +32,17 @@ export class OrdersService {
 
     return order;
   }
+
+
+  async findOneByUser(userId: number): Promise<Order[]> {
+    const order = await this.orderModel.find({userId}).exec();
+
+     if(!order){
+      throw new RpcException({
+        message: `Order #${userId} not found`,
+        status: HttpStatus.NOT_FOUND
+      })}
+
+    return order;
+  }
 }
