@@ -23,7 +23,8 @@ export class OrdersController {
   }
 
   @MessagePattern({ cmd: 'findOneOrderByUser' })
-  async findOneByUser(@Payload('id') userId: number) {
+  async findOneByUser(@Payload('userId') userId: number) {
+    console.log(userId)
     return this.ordersService.findOneByUser(userId);
   }
 }
